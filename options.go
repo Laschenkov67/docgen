@@ -32,7 +32,6 @@ func WithFuncs(fns template.FuncMap) Option {
 		for k, v := range fns {
 			o.funcs[k] = v
 		}
-		// пересоздадим рендереры с обновлёнными функциями
 		o.renderers[FormatDOCX] = docx.New(o.funcs, o.strict)
 		o.renderers[FormatPDF] = pdf.New(o.funcs, o.strict)
 	}
