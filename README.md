@@ -3,8 +3,7 @@
 [![CI](https://github.com/laschenkov67/docgen/actions/workflows/ci.yml/badge.svg)](...)
 [![Go Reference](https://pkg.go.dev/badge/github.com/laschenkov67/docgen.svg)](https://pkg.go.dev/github.com/yourorg/docgen)
 
-Универсальный генератор документов (DOCX, PDF) из шаблонов для Go-проектов:
-интернет-магазинов, SaaS для аграриев, краеведческих сервисов, B2B-CRM и др.
+Универсальный генератор документов (DOCX, PDF) из шаблонов для Go-проектов: интернет-магазинов.
 
 ## Возможности
 
@@ -14,4 +13,3 @@
 - Pluggable `Renderer`-интерфейс — добавляйте свои форматы.
 - Готовые форматтеры под русскую локаль: `rubles`, `money`, `date`, `dateLong`,
   `inn`, `kpp`, валидаторы ИНН.
-- 
