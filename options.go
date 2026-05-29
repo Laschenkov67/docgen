@@ -13,7 +13,7 @@ type Option func(*options)
 type options struct {
 	funcs     template.FuncMap
 	renderers map[Format]Renderer
-	strict    bool // missingkey=error для text/template
+	strict    bool
 }
 
 func defaultOptions() options {

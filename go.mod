@@ -1,6 +1,6 @@
 module github.com/laschenkov67/docgen
 
-go 1.24
+go 1.22
 
 require (
 	github.com/go-pdf/fpdf v0.9.0
