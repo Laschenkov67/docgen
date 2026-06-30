@@ -4,6 +4,9 @@ import (
 	"archive/zip"
 	"bytes"
 	"context"
+	"encoding/xml"
+	"errors"
+	"io"
 	"testing"
 
 	"github.com/laschenkov67/docgen/internal/docx"
@@ -76,6 +79,32 @@ func TestRender_SplitRuns(t *testing.T) {
 	body, err := docx.ExtractPart(out.Bytes(), "word/document.xml")
 	require.NoError(t, err)
 	require.Contains(t, string(body), "Привет, Мир!")
+}
+
+func TestRender_EscapesXMLSpecialChars(t *testing.T) {
+	// Данные с XML-спецсимволами не должны ломать структуру document.xml.
+	doc := buildMinimalDocx(t, `<?xml version="1.0"?><w:document xmlns:w="x"><w:body>
+<w:p><w:r><w:t>Покупатель: {{.Name}}</w:t></w:r></w:p>
+</w:body></w:document>`)
+
+	r := docx.New(tmpl.DefaultFuncs(), true)
+	var out bytes.Buffer
+	err := r.Render(context.Background(), rawTpl{doc}, map[string]any{"Name": `ООО "Ромашка" & Co <Пример>`}, &out)
+	require.NoError(t, err)
+
+	body, err := docx.ExtractPart(out.Bytes(), "word/document.xml")
+	require.NoError(t, err)
+	require.Contains(t, string(body), "ООО &#34;Ромашка&#34; &#38; Co &#60;Пример&#62;")
+
+	// Результат должен оставаться well-formed XML.
+	dec := xml.NewDecoder(bytes.NewReader(body))
+	for {
+		_, err := dec.Token()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		require.NoError(t, err)
+	}
 }
 
 func TestRender_Loop(t *testing.T) {

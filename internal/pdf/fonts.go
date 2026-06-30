@@ -2,8 +2,8 @@ package pdf
 
 import _ "embed"
 
-//go:embed fonts/DejaVuSans.ttf
+//go:embed fonts/DejaVuSansCondensed.ttf
 var dejaVuRegular []byte
 
-//go:embed fonts/DejaVuSans-Bold.ttf
+//go:embed fonts/DejaVuSansCondensed-Bold.ttf
 var dejaVuBold []byte

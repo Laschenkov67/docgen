@@ -1,7 +1,7 @@
 # docgen
 
 [![CI](https://github.com/laschenkov67/docgen/actions/workflows/ci.yml/badge.svg)](...)
-[![Go Reference](https://pkg.go.dev/badge/github.com/laschenkov67/docgen.svg)](https://pkg.go.dev/github.com/yourorg/docgen)
+[![Go Reference](https://pkg.go.dev/badge/github.com/laschenkov67/docgen.svg)](https://pkg.go.dev/github.com/laschenkov67/docgen)
 
 Универсальный генератор документов (DOCX, PDF) из шаблонов для Go-проектов: интернет-магазинов.
 

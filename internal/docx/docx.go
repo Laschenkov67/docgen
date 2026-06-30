@@ -36,6 +36,41 @@ func (r *Renderer) Render(ctx context.Context, tpl interface{ GetRaw() []byte },
 	return r.renderBytes(ctx, tpl.GetRaw(), data, w)
 }
 
+// Validate проверяет синтаксис всех рендерящихся частей .docx (без подстановки
+// данных), чтобы битый шаблон обнаруживался при загрузке, а не при рендере.
+func (r *Renderer) Validate(raw []byte) error {
+	zr, err := zip.NewReader(bytes.NewReader(raw), int64(len(raw)))
+	if err != nil {
+		return fmt.Errorf("docx: open zip: %w", err)
+	}
+	for _, f := range zr.File {
+		if !isRenderable(f.Name) {
+			continue
+		}
+		if err := r.validatePart(f); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *Renderer) validatePart(f *zip.File) error {
+	rc, err := f.Open()
+	if err != nil {
+		return fmt.Errorf("docx: open part %q: %w", f.Name, err)
+	}
+	defer rc.Close()
+
+	body, err := io.ReadAll(rc)
+	if err != nil {
+		return fmt.Errorf("docx: read %q: %w", f.Name, err)
+	}
+	if err := tmpl.Validate(f.Name, string(normalizeForTemplate(body)), r.funcs, r.strict); err != nil {
+		return fmt.Errorf("docx: %q: %w", f.Name, err)
+	}
+	return nil
+}
+
 func (r *Renderer) renderBytes(ctx context.Context, raw []byte, data any, w io.Writer) error {
 	zr, err := zip.NewReader(bytes.NewReader(raw), int64(len(raw)))
 	if err != nil {
@@ -45,11 +80,13 @@ func (r *Renderer) renderBytes(ctx context.Context, raw []byte, data any, w io.W
 	zw := zip.NewWriter(w)
 	defer zw.Close()
 
+	escaped := escapeTemplateData(data)
+
 	for _, f := range zr.File {
 		if err := ctx.Err(); err != nil {
 			return err
 		}
-		if err := r.copyOrRender(f, zw, data); err != nil {
+		if err := r.copyOrRender(f, zw, escaped); err != nil {
 			return err
 		}
 	}
@@ -81,9 +118,7 @@ func (r *Renderer) copyOrRender(f *zip.File, zw *zip.Writer, data any) error {
 		return fmt.Errorf("docx: read %q: %w", f.Name, err)
 	}
 
-	normalized := NormalizeRuns(body)
-
-	normalized = decodeEntitiesInTags(normalized)
+	normalized := normalizeForTemplate(body)
 
 	rendered, err := tmpl.Execute(f.Name, string(normalized), r.funcs, data, r.strict)
 	if err != nil {
@@ -92,6 +127,11 @@ func (r *Renderer) copyOrRender(f *zip.File, zw *zip.Writer, data any) error {
 
 	_, err = out.Write(rendered)
 	return err
+}
+
+func normalizeForTemplate(body []byte) []byte {
+	normalized := NormalizeRuns(body)
+	return decodeEntitiesInTags(normalized)
 }
 
 func isRenderable(name string) bool {

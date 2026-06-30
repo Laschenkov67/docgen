@@ -35,7 +35,7 @@ func main() {
 	if err := eng.LoadTemplateFile("invoice.docx", "examples/invoice/templates/invoice.docx"); err != nil {
 		log.Fatal(err)
 	}
-	if err := eng.LoadTemplateFile("invoice.pdf", "examples/invoice/templates/invoice.pdf.tmpl"); err != nil {
+	if err := eng.LoadTemplateFile("invoice.pdf", "examples/invoice/templates/invoice.pdf.tmpl", docgen.FormatPDF); err != nil {
 		log.Fatal(err)
 	}
 

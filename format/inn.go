@@ -44,6 +44,6 @@ func ValidKPP(s string) bool {
 	return true
 }
 
-func FormatINN(s string) string { return strings.TrimSpace(s) }
+func INN(s string) string { return strings.TrimSpace(s) }
 
-func FormatKPP(s string) string { return strings.TrimSpace(s) }
+func KPP(s string) string { return strings.TrimSpace(s) }

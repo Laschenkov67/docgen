@@ -59,7 +59,10 @@ func (e *Engine) Render(ctx context.Context, name string, data any, format Forma
 		return fmt.Errorf("%w: %q", ErrRendererNotFound, format)
 	}
 
-	return r.Render(ctx, tpl, data, w)
+	if err := r.Render(ctx, tpl, data, w); err != nil {
+		return fmt.Errorf("%w: %w", ErrRenderFailed, err)
+	}
+	return nil
 }
 
 func (e *Engine) HasTemplate(name string) bool {

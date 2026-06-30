@@ -22,6 +22,12 @@ func New(funcs template.FuncMap, strict bool) *Renderer {
 	return &Renderer{funcs: funcs, strict: strict}
 }
 
+// Validate проверяет синтаксис шаблона (без подстановки данных), чтобы битый
+// шаблон обнаруживался при загрузке, а не при рендере.
+func (r *Renderer) Validate(raw []byte) error {
+	return tmpl.Validate("pdf", string(raw), r.funcs, r.strict)
+}
+
 // Render — реализация docgen.Renderer.
 func (r *Renderer) Render(ctx context.Context, tpl interface{ GetRaw() []byte }, data any, w io.Writer) error {
 	if err := ctx.Err(); err != nil {

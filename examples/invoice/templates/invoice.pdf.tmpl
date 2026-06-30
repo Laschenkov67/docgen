@@ -1,0 +1,10 @@
+#TITLE Счёт №{{.Number}}
+#H1 Поставщик
+{{.Seller.Name}}, ИНН {{inn .Seller.INN}}, КПП {{kpp .Seller.KPP}}
+{{.Seller.Address}}
+#H1 Покупатель
+{{.Buyer.Name}}, ИНН {{inn .Buyer.INN}}
+{{.Buyer.Address}}
+#TABLE Наименование|Кол-во|Цена|Сумма
+{{range .Items}}{{.Name}}|{{.Qty}}|{{money .Price}}|{{money .Total}}
+{{end}}#TOTAL Итого: {{money .GrandTotal}} руб.

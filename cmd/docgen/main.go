@@ -40,12 +40,16 @@ func main() {
 	}
 
 	eng := docgen.New()
-	must(eng.LoadTemplateFile("main", *tplPath))
+	must(eng.LoadTemplateFile("main", *tplPath, f))
 
 	out, err := os.Create(*outPath)
 	must(err)
 	defer out.Close()
-	must(eng.Render(context.Background(), "main", data, f, out))
+	if err := eng.Render(context.Background(), "main", data, f, out); err != nil {
+		out.Close()
+		os.Remove(*outPath)
+		log.Fatal(err)
+	}
 	log.Printf("written: %s", *outPath)
 }
 

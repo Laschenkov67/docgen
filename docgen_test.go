@@ -31,4 +31,11 @@ func TestEngine_StrictMode(t *testing.T) {
 	require.NoError(t, eng.LoadTemplateBytes("t", []byte(`{{.Missing}}`), docgen.FormatPDF))
 	err := eng.Render(context.Background(), "t", map[string]any{}, docgen.FormatPDF, &bytes.Buffer{})
 	require.Error(t, err)
+	require.ErrorIs(t, err, docgen.ErrRenderFailed)
+}
+
+func TestEngine_LoadTemplate_InvalidSyntax(t *testing.T) {
+	eng := docgen.New()
+	err := eng.LoadTemplateBytes("broken", []byte(`{{.Unclosed`), docgen.FormatPDF)
+	require.ErrorIs(t, err, docgen.ErrInvalidTemplate)
 }
